@@ -1,0 +1,27 @@
+name: Daily Auto Commit
+
+on:
+  schedule:
+    # Roz subah 9 baje IST (GitHub UTC use karta hai; 3:30 UTC = 9 AM IST)
+    - cron: '30 3 * * *'
+  workflow_dispatch:  # optional: manually run karne ka option
+
+jobs:
+  auto-commit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Modify or create a file
+        run: |
+          echo "Last updated on $(date '+%Y-%m-%d %H:%M:%S')" > daily-update.txt
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "github-actions@github.com"
+          git config --local user.name "GitHub Actions Bot"
+          git add .
+          git commit -m "Automated daily update [skip ci]" || echo "No changes"
+          git push
