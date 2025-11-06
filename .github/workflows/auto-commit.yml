@@ -6,6 +6,9 @@ on:
     - cron: '30 3 * * *'
   workflow_dispatch:  # optional: manually run karne ka option
 
+permissions:
+  contents: write  # allow push
+
 jobs:
   auto-commit:
     runs-on: ubuntu-latest
@@ -18,10 +21,12 @@ jobs:
         run: |
           echo "Last updated on $(date '+%Y-%m-%d %H:%M:%S')" > daily-update.txt
 
-      - name: Commit and push changes
+      - name: Commit and push changes as user
+        env:
+          TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          git config --local user.email "github-actions@github.com"
-          git config --local user.name "GitHub Actions Bot"
+          git config --global user.name "SomnathSenapati"
+          git config --global user.email "12345678+SomnathSenapati@users.noreply.github.com"
           git add .
-          git commit -m "Automated daily update [skip ci]" || echo "No changes"
-          git push
+          git commit -m "Daily commit [skip ci]" || echo "No changes"
+          git push https://x-access-token:${TOKEN}@github.com/${{ github.repository }} HEAD:main
